@@ -7,15 +7,18 @@ from OpenGL.GLUT import *
 from OpenGL.GLU import *
 from textures import *
 
-# Define the size of the rain
+# Taille de la pluie (nombre de gouttes)
 RAINSIZE = 10000
 
+# Liste pour stocker les formes à dessiner
 shapes = []
 
+# Fonction pour dessiner la scène
 def draw_scene():
     for shape in shapes:
         shape.draw()
 
+# Classe de base pour les objets 3D
 class Object:
     def __init__(self, vertices, faces, textures=None):
         self.vertices = vertices
@@ -26,7 +29,7 @@ class Object:
         for i, face in enumerate(self.faces):
             if self.textures is not None and len(self.textures) == len(self.faces):
                 use_texture(self.textures[i])
-            elif self.textures is not None and len(self.textures) == 1 : 
+            elif self.textures is not None and len(self.textures) == 1:
                 use_texture(self.textures[0])
             glBegin(GL_POLYGON)
             tex_coords = [(0.0, 0.0), (1.0, 0.0), (0.0, 1.0), (1.0, 1.0)]
@@ -34,13 +37,13 @@ class Object:
                 glTexCoord2fv(tex_coords[j % 4])
                 glVertex3fv(self.vertices[vertex])
             glEnd()
-    
+
     def __eq__(self, other):
         if isinstance(other, Object):
             return self.vertices == other.vertices and self.faces == other.faces and self.textures == other.textures
         return False
 
-
+# Classe pour un cylindre, héritant de la classe Object
 class Cylinder(Object):
     def __init__(self, x, y, z, radius=1, height=1, num_segments=20, textures=None):
         self.vertices = []
@@ -61,7 +64,7 @@ class Cylinder(Object):
             self.faces.append((i, i + 1, (i + 3) %
                               (num_segments * 2), (i + 2) % (num_segments * 2)))
 
-
+# Classe pour un cube, héritant de la classe Object
 class Cube(Object):
     def __init__(self, x, y, z, width=1, height=1, depth=1, textures=None):
         self.vertices = [
@@ -76,7 +79,7 @@ class Cube(Object):
         ]
         self.textures = textures
 
-
+# Classe pour le toit d'une maison, héritant de la classe Object
 class HouseRoof(Object):
     def __init__(self, x, y, z, width=1, height=1, depth=1, textures=None):
         self.vertices = [
@@ -89,7 +92,7 @@ class HouseRoof(Object):
         ]
         self.textures = textures
 
-
+# Classe pour une vague, héritant de la classe Object
 class Wave(Object):
     def __init__(self, x, y, z, width=10, depth=10, amplitude=1, frequency=1, textures=None):
         self.textures = textures
@@ -110,19 +113,22 @@ class Wave(Object):
         for i in range(self.width):
             for j in range(self.depth):
                 wave_height = self.amplitude * \
-                    np.sin(2 * np.pi * self.frequency * np.sqrt(i**2 + j**2) + t)
-                self.vertices.append([self.x + i, self.y + wave_height, self.z + j])
+                    np.sin(2 * np.pi * self.frequency *
+                           np.sqrt(i**2 + j**2) + t)
+                self.vertices.append(
+                    [self.x + i, self.y + wave_height, self.z + j])
                 if i > 0 and j > 0:
                     self.faces.append(
                         (i * self.depth + j, (i - 1) * self.depth + j, (i - 1) * self.depth + j - 1))
                     self.faces.append(
                         (i * self.depth + j, (i - 1) * self.depth + j - 1, i * self.depth + j - 1))
-    
+
     def draw(self):
         super().draw()
         self.update()
 
-class Raindrop:
+# Classe pour une goutte de pluie, héritant de la classe Object
+class Raindrop(Object):
     def __init__(self):
         self.x = random.uniform(-100, 100)
         self.y = random.uniform(-100, 100)
@@ -142,6 +148,7 @@ class Raindrop:
         if self.y < -1:
             self.y = 100
 
+# Classe pour un ensemble de gouttes de pluie, héritant de la classe Object
 class Raindrops(Object):
     def __init__(self):
         self.raindrops = [Raindrop() for _ in range(RAINSIZE)]

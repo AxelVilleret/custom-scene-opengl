@@ -5,8 +5,6 @@ from OpenGL.GLU import *
 from shapes import *
 
 # Fonction pour dessiner un buisson
-
-
 def create_bush(x, y, z, width=1, height=1, depth=1, num_leaves=50):
     leaf_size = 0.85
     bush = [(x + random.uniform(0, width),
@@ -47,8 +45,8 @@ def create_house(x, y, z, width=8, height=4, depth=4):
     shapes.append(Cube(x + width/4 - height/3, y + height/3, z + depth,
                        width=height/3, height=height/3, depth=0.01, textures=["fenetre"]))
     # Dessiner la cheminée de la maison
-    shapes.append(Cube(x + width/2 - width/12, y + height*5/6, z + depth/2,
-                  width=width/12, height=height/6, depth=width/12, textures=["briques"]))
+    shapes.append(Cube(x + width/2 - width/12, y + height, z + depth/2,
+                  width=width/12, height=height*2/3, depth=width/12, textures=["briques"]))
 
 
 # Fonction pour dessiner l'environnement
