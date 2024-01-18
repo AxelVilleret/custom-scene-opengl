@@ -7,13 +7,16 @@ from OpenGL.GLUT import *
 from OpenGL.GLU import *
 from textures import *
 
+# Define the size of the rain
+RAINSIZE = 10000
+
 shapes = []
 
 def draw_scene():
     for shape in shapes:
         shape.draw()
 
-class GameObject:
+class Object:
     def __init__(self, vertices, faces, textures=None):
         self.vertices = vertices
         self.faces = faces
@@ -33,12 +36,12 @@ class GameObject:
             glEnd()
     
     def __eq__(self, other):
-        if isinstance(other, GameObject):
+        if isinstance(other, Object):
             return self.vertices == other.vertices and self.faces == other.faces and self.textures == other.textures
         return False
 
 
-class Cylinder(GameObject):
+class Cylinder(Object):
     def __init__(self, x, y, z, radius=1, height=1, num_segments=20, textures=None):
         self.vertices = []
         self.faces = []
@@ -59,7 +62,7 @@ class Cylinder(GameObject):
                               (num_segments * 2), (i + 2) % (num_segments * 2)))
 
 
-class Cube(GameObject):
+class Cube(Object):
     def __init__(self, x, y, z, width=1, height=1, depth=1, textures=None):
         self.vertices = [
             [x, y, z], [x, y + height, z], [x + width,
@@ -74,7 +77,7 @@ class Cube(GameObject):
         self.textures = textures
 
 
-class HouseRoof(GameObject):
+class HouseRoof(Object):
     def __init__(self, x, y, z, width=1, height=1, depth=1, textures=None):
         self.vertices = [
             [x, y, z], [x + width, y, z], [x, y + height, z+depth/2],
@@ -87,7 +90,7 @@ class HouseRoof(GameObject):
         self.textures = textures
 
 
-class Wave(GameObject):
+class Wave(Object):
     def __init__(self, x, y, z, width=10, depth=10, amplitude=1, frequency=1, textures=None):
         self.textures = textures
         self.amplitude = amplitude
@@ -119,4 +122,31 @@ class Wave(GameObject):
         super().draw()
         self.update()
 
+class Raindrop:
+    def __init__(self):
+        self.x = random.uniform(-100, 100)
+        self.y = random.uniform(-100, 100)
+        self.z = random.uniform(-100, 100)
+        self.speed = random.uniform(0.05, 0.1)
+        self.size = random.uniform(4.0, 5.0)
 
+    def draw(self):
+        use_texture("eau")
+        glPointSize(self.size)
+        glBegin(GL_POINTS)
+        glVertex3f(self.x, self.y, self.z)
+        glEnd()
+
+    def update(self):
+        self.y -= self.speed
+        if self.y < -1:
+            self.y = 100
+
+class Raindrops(Object):
+    def __init__(self):
+        self.raindrops = [Raindrop() for _ in range(RAINSIZE)]
+
+    def draw(self):
+        for drop in self.raindrops:
+            drop.draw()
+            drop.update()

@@ -5,7 +5,6 @@ from OpenGL.GLU import *
 from objects import *
 from light import *
 from fog import *
-from rain import *
 
 # Variables pour la position et la direction de la caméra
 x = 0
@@ -17,11 +16,10 @@ angle_v = 0
 # Fonction pour décrire la scène
 def render_Scene():
     draw_scene()
-    generate_rain()
 
 # Fonction pour l'animation
 def idle():
-    time.sleep(0.01)
+    time.sleep(0.0001)
     glutPostRedisplay()
 
 # Fonction pour redimensionner la fenêtre
@@ -38,7 +36,8 @@ def reshape(width, height):
 def display():
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
     glPushMatrix()
-    gluLookAt(x, y, z, x + math.sin(angle_h), y + math.sin(angle_v), z - math.cos(angle_h), 0, 1, 0)
+    gluLookAt(x, y, z, x + math.sin(angle_h), y +
+              math.sin(angle_v), z - math.cos(angle_h), 0, 1, 0)
     render_Scene()
     glPopMatrix()
     glutSwapBuffers()
@@ -74,7 +73,7 @@ def main():
     load_textures()
     set_light()
     set_fog()
-    draw_objects()
+    create_objects()
     glEnable(GL_DEPTH_TEST)
     glEnable(GL_TEXTURE_2D)
     glutDisplayFunc(display)
